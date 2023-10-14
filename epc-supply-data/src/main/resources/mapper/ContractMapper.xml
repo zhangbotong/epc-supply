@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cbim.epc.supply.data.mapper.ContractMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.cbim.epc.supply.data.domain.Contract">
+        <id column="id" property="id" />
+        <result column="contract_code" property="contractCode" />
+        <result column="contract_name" property="contractName" />
+        <result column="applicable_scope_name" property="applicableScopeName" />
+        <result column="applicable_scope_code" property="applicableScopeCode" />
+        <result column="contract_classification" property="contractClassification" />
+        <result column="contract_nature" property="contractNature" />
+        <result column="contract_type" property="contractType" />
+        <result column="sign_amount" property="signAmount" />
+        <result column="sign_date" property="signDate" />
+        <result column="contract_cycle" property="contractCycle" />
+        <result column="project_name" property="projectName" />
+        <result column="project_code" property="projectCode" />
+        <result column="construction_address" property="constructionAddress" />
+        <result column="warranty_rule" property="warrantyRule" />
+        <result column="contractor" property="contractor" typeHandler="com.cbim.epc.supply.data.handler.ContractorListTypeHandler"/>
+        <result column="data_type" property="dataType" />
+        <result column="create_date" property="createDate" />
+        <result column="update_date" property="updateDate" />
+        <result column="create_by" property="createBy" />
+        <result column="create_name" property="createName" />
+        <result column="update_by" property="updateBy" />
+        <result column="update_name" property="updateName" />
+        <result column="is_valid" property="isValid" />
+    </resultMap>
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, contract_code, contract_name, applicable_scope_name, applicable_scope_code,
+            contract_classification, contract_nature, contract_type, sign_amount, sign_date,
+            contract_cycle, project_name, project_code, construction_address, warranty_rule,
+            contractor, data_type,
+            create_date, update_date, create_by, create_name, update_by, update_name, is_valid
+    </sql>
+
+</mapper>

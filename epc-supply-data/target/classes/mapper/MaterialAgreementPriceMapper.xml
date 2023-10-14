@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cbim.epc.supply.data.mapper.MaterialAgreementPriceMapper">
+
+    <resultMap id="BaseResultMap" type="com.cbim.epc.supply.data.domain.AgreementPrice">
+        <id column="id" property="id" />
+        <result column="material_id" property="materialId" />
+        <result column="vendor_id" property="vendorId" />
+        <result column="agreement_id" property="agreementId" />
+        <result column="measure_unit_name" property="measureUnitName" />
+        <result column="measure_unit_code" property="measureUnitCode" />
+        <result column="price_unit_name" property="priceUnitName" />
+        <result column="price_unit_code" property="priceUnitCode" />
+        <result column="agreement_price_from" property="agreementPriceFrom" />
+        <result column="agreement_price_to" property="agreementPriceTo" />
+        <result column="tax_rate" property="taxRate" />
+        <result column="tax_rate_code" property="taxRateCode" />
+        <result column="tax_rate_display" property="taxRateDisplay" />
+        <result column="supply_city" property="supplyCity" typeHandler="com.cbim.epc.supply.data.handler.SupplyCityListTypeHandler"/>
+        <result column="shipping_fee" property="shippingFee" />
+        <result column="installation_fee" property="installationFee" />
+        <result column="other_fee" property="otherFee" />
+        <result column="visibility" property="visibility" />
+        <result column="publish_status" property="publishStatus" />
+        <result column="has_been_published" property="hasBeenPublished" />
+        <result column="create_date" property="createDate" />
+        <result column="update_date" property="updateDate" />
+        <result column="create_by" property="createBy" />
+        <result column="create_name" property="createName" />
+        <result column="update_by" property="updateBy" />
+        <result column="update_name" property="updateName" />
+        <result column="is_valid" property="isValid" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, material_id, vendor_id, agreement_id,
+            measure_unit_name, measure_unit_code, price_unit_name, price_unit_code,
+            agreement_price_from, agreement_price_to, tax_rate, tax_rate_code, tax_rate_display,
+            supply_city, shipping_fee, installation_fee, other_fee, visibility,
+            publish_status, has_been_published, create_date, update_date,
+            create_by, create_name, update_by, update_name, is_valid
+    </sql>
+
+    <select id="getVendorAndAgreementInfosByMaterialId" resultType="com.cbim.epc.supply.data.vo.resp.VendorAndAgreementVO">
+        select dense_rank() over (partition by t.vendor_id order by t.update_date desc ) as 'rank',
+                t.material_id,
+               t.vendor_id,
+               t.agreement_id,
+               t.vendor_code,
+               t.vendor_name,
+               t.agreement_price_from,
+               t.agreement_price_to,
+               t.agreement_period_from,
+               t.agreement_period_to,
+               t.update_date
+        from (select esmap.material_id,
+                     esmap.vendor_id,
+                     esmap.agreement_id,
+                     esv.uscc                   as 'vendor_code',
+                      esv.name                   as 'vendor_name',
+                      esmap.agreement_price_from,
+                     esmap.agreement_price_to,
+                     esa.contract_period_before as 'agreement_period_from',
+                      esa.contract_period_after  as 'agreement_period_to',
+                      esmap.update_date
+              from (select material_id,
+                           vendor_id,
+                           agreement_id,
+                           max(agreement_price_from) as 'agreement_price_from',
+                            max(agreement_price_to)   as 'agreement_price_to',
+                            max(update_date)          as 'update_date'
+                    from epc_supply_material_agreement_price
+                    where is_valid = 1
+                      and publish_status = 1
+                      and material_id = #{materialId}
+                    group by material_id, vendor_id, agreement_id) esmap
+                       left join epc_supply_vendor esv on esmap.vendor_id = esv.id
+                       left join epc_supply_agreement esa on esmap.agreement_id = esa.id) t
+
+    </select>
+</mapper>

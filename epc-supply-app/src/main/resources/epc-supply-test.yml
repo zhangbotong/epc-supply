@@ -1,0 +1,93 @@
+spring:
+  mvc:
+    load-on-startup: 1   # 容器启动时即加载servlet，使可以快速响应请求
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 50MB
+      max-request-size: 50MB   # 文件大小设置，记得同步设置nginx的配置
+  datasource:
+    type: com.alibaba.druid.pool.DruidDataSource
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://10.80.253.83/cctcepc?characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=false&allowMultiQueries=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=Asia/Shanghai&nullCatalogMeansCurrent=true&allowPublicKeyRetrieval=true
+    username: cctcepc
+    password: CCTCecp202#
+  redis:
+    host: 10.80.253.84
+    password: CCTCepcCBIM
+    port: 6379
+    # 产品模版使用 2号库
+    database: 2
+  rabbitmq:
+    host: 10.80.252.67
+    port: 5672
+    username: mqadmin
+    password: cbim123
+    virtual-host: /
+    publisher-confirm-type: correlated
+    publisher-returns: true
+    # 消费端手动ACK
+    listener:
+      simple:
+        acknowledge-mode: manual
+
+mybatis-plus:
+  mapper-locations: classpath:/mapper/*.xml
+  global-config:
+    banner: false
+    db-config:
+      id-type: auto
+      table-underline: true
+      logic-delete-value: 1
+      logic-not-delete-value: 0
+  configuration:
+    map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  type-handlers-package: com.cbim.epc.**.data.handler
+
+feign:
+  sentinel:
+    enabled: false
+  okhttp:
+    enabled: true
+  httpclient:
+    enabled: false
+  client:
+    config:
+      default:
+        connectTimeout: 10000
+        readTimeout: 10000
+  compression:
+    request:
+      enabled: true
+    response:
+      enabled: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+  endpoint:
+    prometheus:
+      enabled: true
+    metrics:
+      enabled: true
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+  info:
+    git:
+      mode: full
+
+
+# 自定义配置，请写在最后
+epc:
+  system:
+    log-enabled: true
+    login-check: false
+    log-host: http://10.80.253.82:8081/base/log/get/
+    log-webhook: https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=20625633-55aa-46a7-a7df-87abc32fb166
+  pic:
+    address: https://epc-test.cbim.org.cn/fileServer/openapi/file/image

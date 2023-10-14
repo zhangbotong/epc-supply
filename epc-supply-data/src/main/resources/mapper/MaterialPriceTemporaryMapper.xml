@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cbim.epc.supply.data.mapper.MaterialPriceTemporaryMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.cbim.epc.supply.data.domain.MaterialPriceTemporary">
+        <id column="id" property="id" />
+        <result column="material_id" property="materialId" />
+        <result column="vendor_id" property="vendorId" />
+        <result column="measure_unit_name" property="measureUnitName" />
+        <result column="measure_unit_code" property="measureUnitCode" />
+        <result column="price_unit_name" property="priceUnitName" />
+        <result column="price_unit_code" property="priceUnitCode" />
+        <result column="temp_price" property="tempPrice" />
+        <result column="tax_rate" property="taxRate" />
+        <result column="project_name" property="projectName" />
+        <result column="supply_city" property="supplyCity" />
+        <result column="shipping_fee" property="shippingFee" />
+        <result column="installation_fee" property="installationFee" />
+        <result column="notes" property="notes" />
+        <result column="source" property="source" />
+        <result column="applicable_scope_name" property="applicableScopeName" />
+        <result column="applicable_scope_code" property="applicableScopeCode" />
+        <result column="create_date" property="createDate" />
+        <result column="update_date" property="updateDate" />
+        <result column="create_by" property="createBy" />
+        <result column="create_name" property="createName" />
+        <result column="update_by" property="updateBy" />
+        <result column="update_name" property="updateName" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, material_id, vendor_id, measure_unit_name, measure_unit_code, price_unit_name, price_unit_code,
+            temp_price, tax_rate, project_name, supply_city, shipping_fee, installation_fee,
+            notes, source, applicable_scope_name, applicable_scope_code, create_date,
+            update_date, create_by, create_name, update_by, update_name
+    </sql>
+
+    <select id="queryByPage" resultType="com.cbim.epc.supply.data.domain.MaterialPriceTemporaryJoin">
+        select esm.object_type_code as 'objectTypeCode',
+               esm.material_code as 'materialCode',
+               esm.material_name as 'materialName',
+               esv.name as 'vendorName',
+               esv.uscc as 'usci',
+               esmpt.id as 'priceId',
+               esmpt.material_id as 'materialId',
+               esmpt.vendor_id as 'vendorId',
+               esmpt.measure_unit_name as 'measureUnitName',
+               esmpt.measure_unit_code as 'measureUnitCode',
+               esmpt.price_unit_name as 'priceUnitName',
+               esmpt.price_unit_code as 'priceUnitCode',
+               esmpt.temp_price as 'tempPrice',
+               esmpt.tax_rate as 'taxRate',
+               esmpt.project_name as 'projectName',
+               esmpt.supply_city as 'supplyCityStr',
+               esmpt.shipping_fee as 'shippingFee',
+               esmpt.installation_fee as 'installationFee',
+               esmpt.notes as 'notes',
+               esmpt.source as 'source',
+               esmpt.applicable_scope_name as 'applicableScopeName',
+               esmpt.applicable_scope_code as 'applicableScopeCode',
+               esmpt.create_date as 'createDate',
+               esmpt.update_date as 'updateDate',
+               esmpt.create_by as 'createBy',
+               esmpt.create_name as 'createName',
+               esmpt.update_by as 'updateBy',
+               esmpt.update_name as 'updateName'
+        from epc_supply_material_temporary_price esmpt
+                 left join epc_supply_material esm on esmpt.material_id = esm.id
+                 left join epc_supply_vendor esv on esmpt.vendor_id = esv.id
+        <where>
+            <if test="param.criteria != null and param.criteria != ''">
+                (esm.material_code like CONCAT('%', #{param.criteria}, '%') or esm.material_name like CONCAT('%', #{param.criteria}, '%'))
+            </if>
+            <if test="param.objectTypeCode != null and param.objectTypeCode != ''">
+                and esm.object_type_code like CONCAT(#{param.objectTypeCode}, '%')
+            </if>
+        </where>
+        order by esmpt.material_id, esmpt.update_date desc
+        limit #{param.start}, #{param.pageSize}
+    </select>
+
+    <select id="queryCount" resultType="java.lang.Integer">
+        select count(*)
+        from epc_supply_material_temporary_price esmpt
+        left join epc_supply_material esm on esmpt.material_id = esm.id
+        left join epc_supply_vendor esv on esmpt.vendor_id = esv.id
+        <where>
+            <if test="param.criteria != null and param.criteria != ''">
+                (esm.material_code like CONCAT('%', #{param.criteria}, '%') or esm.material_name like CONCAT('%', #{param.criteria}, '%'))
+            </if>
+            <if test="param.objectTypeCode != null and param.objectTypeCode != ''">
+                and esm.object_type_code like CONCAT(#{param.objectTypeCode}, '%')
+            </if>
+        </where>
+    </select>
+    
+    <select id="queryAvgPrice" resultType="com.cbim.epc.supply.data.vo.resp.TemporaryPriceAvgVO">
+        select ifnull(sum(temp_price), 0) as 'total_temp_price',
+                count(*)                   as 'count'
+        from epc_supply_material_temporary_price
+        where material_id = #{materialId}
+    </select>
+
+</mapper>

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cbim.epc.supply.data.mapper.MaterialPriceContractMapper">
+
+    <resultMap id="BaseResultMap" type="com.cbim.epc.supply.data.domain.MaterialContractPrice">
+        <id column="id" property="id" />
+        <result column="material_id" property="materialId" />
+        <result column="vendor_id" property="vendorId" />
+        <result column="contract_id" property="contractId" />
+        <result column="measure_unit_name" property="measureUnitName" />
+        <result column="measure_unit_code" property="measureUnitCode" />
+        <result column="price_unit_name" property="priceUnitName" />
+        <result column="price_unit_code" property="priceUnitCode" />
+        <result column="unit_price" property="unitPrice" />
+        <result column="tax_rate" property="taxRate" />
+        <result column="engineering_quantity" property="engineeringQuantity" />
+        <result column="total_price" property="totalPrice" />
+        <result column="expense_notes" property="expenseNotes" />
+        <result column="publish_status" property="publishStatus" />
+        <result column="has_been_published" property="hasBeenPublished" />
+        <result column="create_date" property="createDate" />
+        <result column="update_date" property="updateDate" />
+        <result column="create_by" property="createBy" />
+        <result column="create_name" property="createName" />
+        <result column="update_by" property="updateBy" />
+        <result column="update_name" property="updateName" />
+        <result column="is_valid" property="isValid" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, material_id, vendor_id, contract_id,
+            measure_unit_name, measure_unit_code, price_unit_name, price_unit_code,
+            unit_price, tax_rate, engineering_quantity, total_price, expense_notes,
+            publish_status, has_been_published, create_date, update_date,
+            create_by, create_name, update_by, update_name, is_valid
+    </sql>
+</mapper>

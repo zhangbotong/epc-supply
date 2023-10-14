@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>epc-log</title>
+</head>
+<body>
+<h2 style="text-align:center">EPC 日志报警</h2>
+<b th:text="${logResult}"></b>
+<!--th:each 遍历-->
+<p th:each="name:${list}" th:utext="${name}"></p>
+<p style="color: aliceblue"></p>
+</body>
+</html>

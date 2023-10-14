@@ -1,0 +1,46 @@
+epc:
+  cache:
+    redis: true
+  sdk:
+    user-host: http://10.80.253.81:8001
+    meta-host: http://10.80.253.81:8002
+    file-host: http://10.80.253.81:8999
+    node-host: http://10.80.253.81:8003
+    component-host: http://10.80.253.81:8003
+    easyapi-host: http://10.80.253.81:8000
+    easyapi-token: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHBpcmVfdGltZSI6MTcwOTg2MDMzNzMxNH0.QlitfW6yTqbLwsX4bkZSBzv6AkG_lhet8eRTSp-NDUM
+  file:
+    img:
+      support: png,jpg,jpeg,gif
+      norename: rvt,rte,rfa,dwg
+    upload:
+      path: /data/nas/test/
+      allowedOrigins: https://epc-test.cbim.org.cn
+    download:
+      path: https://epc-test.cbim.org.cn/fileServer/openapi/file/image?id={}
+  node:
+    key: NOD
+    preview: https://epc-test.cbim.org.cn/node/preview/#/?id={}
+  uc:
+    operationUrl: https://epc-test.cbim.org.cn
+    UcUrl: https://test6.cbim.org.cn/passport/
+
+cbim:
+  uc:
+    sdk:
+      type: WS
+      host: test6 #！！！随环境变化
+      port: 30091 #每个环境固定
+      #zkUrl: 10.80.252.168:2181 #已废弃zk
+      enable: true #开关
+      #type为ws、app时生效
+      UcUrl: https://test6-gw.cbim.org.cn/cbim-uc #uc网关地址！！！随环境变化
+      #UcUrl: https://test6.cbim.org.cn/passport/ #uc网关地址！！！随环境变化
+      #system: xboat#系统code，八仙xboat，马良xcube，云渲染rendering
+      system: platform
+      #在uc注册的系统appKey和secret，type为uc时不生效
+      key: f5de3633f5ed48ff8e29a368dcaa0b5c #每个系统不一样，每个环境一样
+      # key: e3c091d7c0ef42d49ac9b598475e478a #每个系统不一样，每个环境一样
+      secret: 0810432d73b3478b9f89e62e682a07cb #每个系统不一样，每个环境一样
+      # secret: adf207306aca4c81ae5eb0cf57252f29 #每个系统不一样，每个环境一样
+      filter: true

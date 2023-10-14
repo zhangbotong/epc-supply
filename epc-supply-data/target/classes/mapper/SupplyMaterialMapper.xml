@@ -1,0 +1,242 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cbim.epc.supply.data.mapper.SupplyMaterialMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.cbim.epc.supply.data.domain.SupplyMaterial">
+        <id column="id" property="id" />
+        <result column="version" property="version" />
+        <result column="obj_version" property="objVersion" />
+        <result column="object_id" property="objectId" />
+        <result column="parent_name" property="parentName" />
+        <result column="parent_code" property="parentCode" />
+        <result column="object_type_name" property="objectTypeName" />
+        <result column="object_type_code" property="objectTypeCode" />
+        <result column="applicable_scope_name" property="applicableScopeName" />
+        <result column="applicable_scope_code" property="applicableScopeCode" />
+        <result column="measure_unit_name" property="measureUnitName" />
+        <result column="measure_unit_code" property="measureUnitCode" />
+        <result column="material_name" property="materialName" />
+        <result column="material_code" property="materialCode" />
+        <result column="thumbnail" property="thumbnail" typeHandler="com.cbim.epc.supply.data.handler.FileInfoListTypeHandler"/>
+        <result column="file_info" property="fileInfo" typeHandler="com.cbim.epc.supply.data.handler.FileInfoListTypeHandler"/>
+        <result column="publish_status" property="publishStatus" />
+        <result column="has_been_published" property="hasBeenPublished" />
+        <result column="create_date" property="createDate" />
+        <result column="update_date" property="updateDate" />
+        <result column="create_by" property="createBy" />
+        <result column="create_name" property="createName" />
+        <result column="update_by" property="updateBy" />
+        <result column="update_name" property="updateName" />
+        <result column="is_valid" property="isValid" />
+        <result column="has_changes" property="hasChanges" />
+        <result column="reference_count" property="referenceCount" />
+        <result column="material_source" property="materialSource" />
+    </resultMap>
+
+    <select id="queryCount" parameterType="com.cbim.epc.supply.data.vo.req.MaterialQueryParam" resultType="java.lang.Integer">
+            select count(1) from (
+                    select  id,
+                    <![CDATA[
+                       case when t.material_id is not null and b.material_id is not null THEN '1'
+                            when t.material_id is null and b.material_id is not null THEN '2'
+                            when t.material_id is null and b.material_id is null and esm.material_source is null THEN '3'
+                            else '4' end  material_source
+                    ]]>
+                    from epc_supply_material esm
+                    left join (
+                        select DISTINCT esmap.material_id,
+                        esa.contract_period_before,
+                        esa.contract_period_after
+                        from epc_supply_material_agreement_price esmap
+                        inner join epc_supply_agreement esa on esmap.agreement_id =esa.id and esa.is_deleted = 'no'
+                        where esmap.is_valid = '1' and esa.contract_period_after >= now()  and now() >= esa.contract_period_before
+                    ) t on t.material_id = esm.id
+                    left join (
+                        select DISTINCT material_id from epc_supply_material_agreement_price  where  is_valid = '1'
+                    ) b on b.material_id = esm.id
+                    where esm.is_valid = '1'
+                    <if test="objectTypeCode != null and objectTypeCode !=''">
+                        and esm.object_type_code like concat(#{objectTypeCode},'%')
+                    </if>
+                    <if test="objectTypeCodes != null and objectTypeCodes !=''">
+                        and esm.object_type_code in (${objectTypeCodes})
+                    </if>
+                    <if test="materialName != null and materialName !=''">
+                        and esm.material_name like concat('%',#{materialName},'%')
+                    </if>
+                    <if test="publishStatus != null and publishStatus !=''">
+                        and esm.publish_status in (${publishStatus})
+                    </if>
+                    <if test="vendorId != null and vendorId != ''">
+                        <![CDATA[ and (esm.vendor_id = #{vendorId} or (esm.vendor_id <> #{vendorId} and esm.publish_status = '1')) ]]>
+                    </if>
+            ) e where 1 = 1
+            <if test="materialSources != null and materialSources != ''">
+               and  e.material_source in (${materialSources})
+            </if>
+
+</select>
+
+    <select id="queryMaterialList" parameterType="com.cbim.epc.supply.data.vo.req.MaterialQueryParam" resultMap="BaseResultMap">
+        select * from (select
+                            esm.id,
+                            esm.version,
+                            esm.obj_version,
+                            esm.object_id,
+                            esm.parent_name,
+                            esm.parent_code,
+                            esm.object_type_name,
+                            esm.object_type_code,
+                            esm.applicable_scope_name,
+                            esm.applicable_scope_code,
+                            esm.measure_unit_name,
+                            esm.measure_unit_code,
+                            esm.material_name,
+                            esm.material_code,
+                            esm.thumbnail,
+                            esm.file_info,
+                            esm.publish_status,
+                            esm.has_been_published,
+                            esm.create_date,
+                            esm.create_by,
+                            esm.create_name,
+                            <if test="vendorId != null and vendorId !=''">
+                                case when esm.vendor_id = #{vendorId} THEN esm.update_date else null end update_date,
+                                case when esm.vendor_id = #{vendorId} THEN esv.name else null end update_name,
+                            </if>
+                            <if test="vendorId == null or vendorId ==''">
+                                esm.update_date,
+                                esm.update_name,
+                            </if>
+                            esm.update_by,
+                            esm.is_valid,
+                            esm.has_changes,
+                            esm.reference_count,
+                            <![CDATA[
+                               case when t.material_id is not null and b.material_id is not null THEN '1'
+                                    when t.material_id is null and b.material_id is not null THEN '2'
+                                    when t.material_id is null and b.material_id is null and esm.material_source is null THEN '3'
+                                    else '4' end  material_source
+                             ]]>
+                      from epc_supply_material esm
+                      left join epc_supply_vendor esv on esv.id = esm.vendor_id
+                      left join (
+                        select DISTINCT esmap.material_id,
+                                esa.contract_period_before,
+                                esa.contract_period_after
+                        from epc_supply_material_agreement_price esmap
+                        inner join epc_supply_agreement esa on esmap.agreement_id =esa.id and esa.is_deleted = 'no'
+                        where esmap.is_valid = '1' and esa.contract_period_after >= now()  and now() >= esa.contract_period_before
+                      ) t on t.material_id = esm.id
+                      left join (
+                        select DISTINCT material_id from epc_supply_material_agreement_price  where  is_valid = '1'
+                      ) b on b.material_id = esm.id
+                      where esm.is_valid = '1'
+                      <if test="objectTypeCode != null and objectTypeCode !=''">
+                          and esm.object_type_code like concat(#{objectTypeCode},'%')
+                      </if>
+                      <if test="objectTypeCodes != null and objectTypeCodes !=''">
+                            and esm.object_type_code in(${objectTypeCodes})
+                      </if>
+                      <if test="materialName != null and materialName !=''">
+                          and esm.material_name like concat('%',#{materialName},'%')
+                      </if>
+                      <if test="publishStatus != null and publishStatus !=''">
+                            and esm.publish_status in (${publishStatus})
+                      </if>
+                      <if test="vendorId != null and vendorId != ''">
+                         <![CDATA[ and (esm.vendor_id = #{vendorId} or (esm.vendor_id <> #{vendorId} and esm.publish_status = '1')) ]]>
+                      </if>
+        ) esm
+        where 1 = 1
+        <if test="materialSources != null and materialSources != ''">
+            and esm.material_source in (${materialSources})
+        </if>
+        order by esm.${sortField} ${sorted}
+        <if test="pageSize != null and pageSize !=''">
+            LIMIT ${pageSize}
+        </if>
+        <if test="pageNum != null and pageNum !=''">
+            OFFSET ${pageNum}
+        </if>
+    </select>
+
+    <sql id="priceSql">
+        select * from (
+                select
+                    row_number() over (partition by t.material_id order by t.update_date desc ) as 'rank',
+                    t.material_id,
+                    t.vendor_id,
+                    t.agreement_id,
+                    t.vendor_code,
+                    t.vendor_name,
+                    t.agreement_price_from,
+                    t.agreement_price_to,
+                    t.agreement_period_from,
+                    t.agreement_period_to,
+                    t.update_date
+                from
+                    (
+                    select
+                        esmap.material_id,
+                        esmap.vendor_id,
+                        esmap.agreement_id,
+                        esv.uscc as 'vendor_code',
+                        esv.name as 'vendor_name',
+                        esmap.agreement_price_from,
+                        esmap.agreement_price_to,
+                        esa.contract_period_before as 'agreement_period_from',
+                        esa.contract_period_after as 'agreement_period_to',
+                        esmap.update_date
+                    from
+                        (
+                        select
+                            material_id,
+                            vendor_id,
+                            agreement_id,
+                            max(agreement_price_from) as 'agreement_price_from',
+                            max(agreement_price_to) as 'agreement_price_to',
+                            max(update_date) as 'update_date'
+                        from
+                            epc_supply_material_agreement_price
+                        where
+                            is_valid = 1
+                            and publish_status = 1
+                        group by
+                            material_id,
+                            vendor_id,
+                            agreement_id) esmap
+                    left join epc_supply_vendor esv on esmap.vendor_id = esv.id
+                    left join epc_supply_agreement esa on esmap.agreement_id = esa.id) t
+              ) z
+            where z.`rank` = 1
+    </sql>
+
+    <select id="selectByObjectTypeCodeAndEntCode"  resultType="com.cbim.epc.supply.data.vo.resp.ProductMaterialVo">
+        select t1.*,
+               t2.vendor_name as defaultVendorName,
+               t2.agreement_price_from as defaultVendorPriceMin,
+               t2.agreement_price_to as defaultVendorPriceMax,
+               t2.vendor_code as defaultVendorCode,
+               t2.vendor_id as defaultVendorId
+        from
+            (select
+                esm.id,
+                esm.material_name as materialName,
+                esm.material_code as materialCode,
+                esm.object_type_code as objectTypeCode,
+                esm.thumbnail as thumbnailUrl
+            FROM epc_supply_material esm
+            where esm.is_valid = 1 and esm.publish_status =1
+            and esm.applicable_scope_code = #{entCode}
+            <if test="objectCodes !=null and objectCodes.size() > 0">
+                and  esm.object_type_code in
+                <foreach
+                    collection="objectCodes" item="item" index="index" open="(" separator="," close=")">
+                        #{item}
+                    </foreach>
+            </if> ) t1
+            left join (<include refid="priceSql"></include>)t2 on t2.material_id = t1.id
+    </select>
+</mapper>

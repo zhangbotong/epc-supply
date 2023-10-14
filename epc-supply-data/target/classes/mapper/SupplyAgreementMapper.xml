@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cbim.epc.supply.data.mapper.AgreementMapper">
+
+    <resultMap id="BaseResultMap" type="com.cbim.epc.supply.data.domain.Agreement">
+            <id property="id" column="id" jdbcType="BIGINT"/>
+            <result property="supplierId" column="supplier_id" jdbcType="BIGINT"/>
+            <result property="entCode" column="ent_code" jdbcType="VARCHAR"/>
+            <result property="contractPeriodBefore" column="contract_period_before" jdbcType="VARCHAR"/>
+            <result property="contractInfo" column="contract_info" jdbcType="OTHER"/>
+            <result property="file" column="file" jdbcType="OTHER"/>
+            <result property="createDate" column="create_date" jdbcType="TIMESTAMP"/>
+            <result property="updateDate" column="update_date" jdbcType="TIMESTAMP"/>
+            <result property="createBy" column="create_by" jdbcType="VARCHAR"/>
+            <result property="createName" column="create_name" jdbcType="VARCHAR"/>
+            <result property="updateBy" column="update_by" jdbcType="VARCHAR"/>
+            <result property="updateName" column="update_name" jdbcType="VARCHAR"/>
+            <result property="contractPeriodAfter" column="contract_period_after" jdbcType="VARCHAR"/>
+            <result property="state" column="state" jdbcType="VARCHAR"/>
+            <result property="name" column="name" jdbcType="VARCHAR"/>
+            <result property="code" column="code" jdbcType="VARCHAR"/>
+            <result property="isDeleted" column="is_deleted" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,supplier_id,ent_code,
+        contract_period_before,contract_info,file,
+        create_date,update_date,create_by,
+        create_name,update_by,update_name,
+        contract_period_after,state,name,
+        code,is_deleted
+    </sql>
+</mapper>

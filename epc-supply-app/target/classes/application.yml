@@ -1,0 +1,28 @@
+server:
+  port: 8081
+
+spring:
+  application:
+    name: epc-supply
+  security:
+    user:
+      name: cctcepc
+      password: $2a$10$MrEXIFa1b23Gx35JC3OCFOA7lb3Z63LpN3L9fRDBy30eUTsUQP5QO  # epc@2013
+  profiles:
+    active: dev
+    include: druid
+  config:
+    import:
+      - ${spring.application.name}-${spring.profiles.active}.yml
+
+
+  #  cloud:
+  #    nacos:
+  #      username: @nacos.username@
+  #      password: @nacos.password@
+  #      discovery:
+  #        server-addr: ${NACOS_HOST:epc-nacos}:${NACOS_PORT:8848}
+  #      config:
+  #        server-addr: ${spring.cloud.nacos.discovery.server-addr}
+
+
